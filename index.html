@@ -17,15 +17,17 @@
     <div class="container">
       <h1 class="logo">AuraSense</h1>
       <button id="contrastToggle" class="control" aria-pressed="false">Toggle high contrast</button>
-      <nav role="navigation" aria-label="Main navigation">
-        <ul class="nav">
-          <li><a href="#" aria-current="page">Home</a></li>
-          <li><a href="#features">What we do</a></li>
-          <li><a href="#how-it-works">How it works</a></li>
-          <li><a href="#get-involved">Get involved</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-        <div class="nav-underline" aria-hidden="true"></div>
+      <nav id="main-nav" class="main-nav nav-bar" role="navigation" aria-label="Main navigation" hidden>
+        <div class="nav-inner">
+          <ul class="nav nav-horizontal" role="menubar" aria-label="Primary">
+            <li role="none"><a role="menuitem" href="#" aria-current="page">Home</a></li>
+            <li role="none"><a role="menuitem" href="#features">What we do</a></li>
+            <li role="none"><a role="menuitem" href="#how-it-works">How it works</a></li>
+            <li role="none"><a role="menuitem" href="#get-involved">Get involved</a></li>
+            <li role="none"><a role="menuitem" href="#contact">Contact</a></li>
+          </ul>
+          <div class="nav-underline" aria-hidden="true"></div>
+        </div>
       </nav>
     </div>
   </header>

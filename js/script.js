@@ -82,8 +82,9 @@
     const active = mainNav.querySelector('a[aria-current="page"]') || mainNav.querySelector('a');
     if(!active) { navUnderline.style.opacity = '0'; return; }
     const aRect = active.getBoundingClientRect();
-    const navRect = mainNav.getBoundingClientRect();
-    const left = aRect.left - navRect.left + mainNav.scrollLeft;
+    const navInner = mainNav.querySelector('.nav-inner') || mainNav;
+    const navRect = navInner.getBoundingClientRect();
+    const left = aRect.left - navRect.left + (navInner.scrollLeft || 0);
     navUnderline.style.width = aRect.width + 'px';
     navUnderline.style.left = left + 'px';
     navUnderline.style.opacity = '1';
