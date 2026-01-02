@@ -74,26 +74,54 @@
     announce(enabled ? 'High contrast enabled' : 'High contrast disabled');
   });
 
-  // Nav toggle for small screens
+  // Nav toggle for small screens + animated open/close and underline positioning
+  const navUnderline = mainNav ? mainNav.querySelector('.nav-underline') : null;
+  function updateNavIndicator(){
+    if(!navUnderline) return;
+    // find the active link
+    const active = mainNav.querySelector('a[aria-current="page"]') || mainNav.querySelector('a');
+    if(!active) { navUnderline.style.opacity = '0'; return; }
+    const aRect = active.getBoundingClientRect();
+    const navRect = mainNav.getBoundingClientRect();
+    const left = aRect.left - navRect.left + mainNav.scrollLeft;
+    navUnderline.style.width = aRect.width + 'px';
+    navUnderline.style.left = left + 'px';
+    navUnderline.style.opacity = '1';
+  }
+
   if(navToggle && mainNav){
     navToggle.addEventListener('click', ()=>{
       const expanded = navToggle.getAttribute('aria-expanded') === 'true';
       navToggle.setAttribute('aria-expanded', String(!expanded));
       if(expanded){
-        mainNav.hidden = true;
+        // close
+        mainNav.classList.remove('open');
+        setTimeout(()=>{ mainNav.hidden = true; }, 220);
         announce('Menu closed');
       } else {
+        // open
         mainNav.hidden = false;
+        // small delay to allow transitions
+        setTimeout(()=>{ mainNav.classList.add('open'); updateNavIndicator(); }, 10);
         announce('Menu opened');
       }
     });
 
-    // close nav when link clicked
-    mainNav.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>{
+    // set active on click and close nav on small screens
+    mainNav.querySelectorAll('a').forEach(a=>a.addEventListener('click', (ev)=>{
+      // set aria-current
+      mainNav.querySelectorAll('a').forEach(x=>x.removeAttribute('aria-current'));
+      a.setAttribute('aria-current','page');
+      updateNavIndicator();
       if(window.innerWidth <= 800){
-        mainNav.hidden = true; navToggle.setAttribute('aria-expanded','false');
+        mainNav.classList.remove('open'); mainNav.hidden = true; navToggle.setAttribute('aria-expanded','false');
       }
     }));
+
+    // position underline on load and resize
+    window.addEventListener('resize', ()=>{ setTimeout(updateNavIndicator, 60); });
+    // initial position once DOM is stable
+    setTimeout(updateNavIndicator, 80);
   }
 
   // Keyboard shortcuts
