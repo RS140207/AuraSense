@@ -145,6 +145,11 @@ section{scroll-margin-top:calc(var(--header-offset) + 12px)}
 .sr-tool input[type=range]{width:140px}
 .sr-tool button{white-space:nowrap}
 
+/* module content details */
+.module-content{background:linear-gradient(180deg,#fff,#fbfbfb);padding:.75rem;border-radius:8px;border:1px solid #eee;margin-top:.5rem}
+.module-content p{margin:.45rem 0}
+.module-content .hint{font-size:.95rem}
+
 /* try page */
 .try-hero{padding:1.5rem 0;margin:1rem 0;border-radius:10px;background:linear-gradient(90deg,var(--brand-color),var(--accent));color:#fff}
 .try-cards .cards{margin-top:1rem}
