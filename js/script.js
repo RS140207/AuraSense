@@ -102,7 +102,7 @@
 
   readBtn.addEventListener('click', ()=>{
     // read a concise summary of the page
-    const parts = [document.getElementById('hero-heading').innerText, document.getElementById('intro').innerText, document.getElementById('features-heading').innerText, document.getElementById('how-heading').innerText];
+    const parts = [document.getElementById('hero-heading').innerText, document.getElementById('intro').innerText, document.getElementById('assistive-demo-heading').innerText, document.getElementById('how-heading').innerText];
     speak(parts.join('. '));
     announce('Reading page content');
   });
