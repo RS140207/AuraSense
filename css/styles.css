@@ -146,8 +146,19 @@ footer{border-top:1px solid #e6e6e6;padding:1rem 0;margin-top:2rem}
 
 /* login page */
 .login-page{min-height:calc(100vh - var(--header-offset));display:flex;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(180deg, rgba(0,168,150,0.03), rgba(0,102,204,0.02))}
-.login-card{background:linear-gradient(180deg,#fff,#fbfdff);padding:2rem;border-radius:14px;box-shadow:0 24px 60px rgba(2,6,23,0.10);max-width:960px;width:100%;display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:center}
+.login-card{background:linear-gradient(180deg,#fff,#fbfdff);padding:2rem;border-radius:14px;box-shadow:0 24px 60px rgba(2,6,23,0.10);max-width:960px;width:100%;display:grid;grid-template-columns:1fr 360px;gap:1.25rem;align-items:center;transition:transform 260ms cubic-bezier(.2,.9,.3,1),box-shadow 260ms cubic-bezier(.2,.9,.3,1)}
+/* hover effects only for pointer devices (cursor present) */
+@media (hover: hover) and (pointer: fine) {
+  /* Apply elevation only when hovering the login card itself */
+  .login-card:hover {transform:translateY(-8px);box-shadow:0 38px 100px rgba(0,102,204,0.12),0 14px 40px rgba(0,168,150,0.06)}
+  /* animate logo when the card is hovered (keeps behavior focused on card) */
+  .login-card:hover .showcase-logo{transform:translateY(-6px) scale(1.05);box-shadow:none}
+} 
+
 .login-brand{display:flex;align-items:center;gap:.85rem}
+.showcase-logo{transition:transform 280ms cubic-bezier(.2,.9,.3,1);box-shadow:none}
+/* keep keyboard focus outline but don't trigger hover transforms */
+.showcase-logo:focus{outline:4px solid rgba(0,168,150,0.12);outline-offset:6px}
 .login-hero h2{margin:0;font-size:1.6rem;color:var(--brand-color)}
 .login-hero p{color:#555;margin-top:.5rem}
 .login-form{padding:1rem;border-radius:10px;background:linear-gradient(180deg, rgba(0,102,204,0.02), rgba(0,168,150,0.02));}
