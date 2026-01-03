@@ -100,12 +100,55 @@
     window.speechSynthesis.speak(u);
   }
 
-  readBtn.addEventListener('click', ()=>{
-    // read a concise summary of the page
+  function readPageSummary(){
     const parts = [document.getElementById('hero-heading').innerText, document.getElementById('intro').innerText, document.getElementById('assistive-demo-heading').innerText, document.getElementById('how-heading').innerText];
     speak(parts.join('. '));
     announce('Reading page content');
-  });
+  }
+
+  readBtn.addEventListener('click', ()=>{ readPageSummary(); });
+
+  // Assistive demo: voice-guided navigation and high-contrast preview
+  const assistantBtn = document.getElementById('startAssistant');
+  const contrastBtn = document.getElementById('contrastDemoBtn');
+  let assistantRecognition = null;
+  let assistantListening = false;
+
+  function handleAssistantCommand(text){
+    const t = text.toLowerCase();
+    announce('Heard: ' + text);
+    if(t.includes('read')){ readPageSummary(); return; }
+    if(t.includes('stop')){ if('speechSynthesis' in window) window.speechSynthesis.cancel(); announce('Stopped reading'); return; }
+    if(t.includes('increase font') || t.includes('bigger')){ setBaseFontSize(Math.min(32, getBaseFontSize()+2)); return; }
+    if(t.includes('decrease font') || t.includes('smaller')){ setBaseFontSize(Math.max(12, getBaseFontSize()-2)); return; }
+    if(t.includes('contact') || t.includes('go to contact')){ const el = document.getElementById('contact'); if(el){ el.scrollIntoView({behavior:'smooth'}); announce('Going to contact section'); } return; }
+    if(t.includes('open menu')){ if(navToggle){ navToggle.click(); announce('Toggling menu'); } return; }
+    if(t.includes('high contrast')){ const now = document.documentElement.classList.toggle('high-contrast'); announce(now ? 'High contrast enabled' : 'High contrast disabled'); if(contrastBtn) contrastBtn.setAttribute('aria-pressed', String(now)); return; }
+    // fallback help
+    speak('Sorry, I did not understand. Try: read the page, stop, increase font, decrease font, go to contact, open menu, or high contrast.');
+  }
+
+  if(assistantBtn){
+    assistantBtn.addEventListener('click', ()=>{
+      if(!window.SpeechRecognition && !window.webkitSpeechRecognition){ announce('Speech recognition not supported'); assistantBtn.setAttribute('aria-disabled','true'); return; }
+      if(!assistantRecognition){
+        const AR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        assistantRecognition = new AR();
+        assistantRecognition.continuous = false;
+        assistantRecognition.interimResults = false;
+        assistantRecognition.lang = 'en-US';
+        assistantRecognition.onresult = (ev)=>{ const transcript = Array.from(ev.results).map(r=>r[0].transcript).join(' '); handleAssistantCommand(transcript); };
+        assistantRecognition.onend = ()=>{ assistantListening=false; assistantBtn.setAttribute('aria-pressed','false'); assistantBtn.textContent = 'Start assistant'; announce('Voice assistant stopped'); };
+        assistantRecognition.onerror = (err)=>{ console.error(err); announce('Voice assistant error'); assistantListening=false; assistantBtn.setAttribute('aria-pressed','false'); assistantBtn.textContent='Start assistant'; };
+      }
+      if(!assistantListening){ try{ assistantRecognition.start(); assistantListening=true; assistantBtn.setAttribute('aria-pressed','true'); assistantBtn.textContent='Listening…'; announce('Voice assistant listening'); }catch(e){ console.error(e); } }
+      else { try{ assistantRecognition.stop(); }catch(e){} }
+    });
+  }
+
+  if(contrastBtn){
+    contrastBtn.addEventListener('click', ()=>{ const now = document.documentElement.classList.toggle('high-contrast'); contrastBtn.setAttribute('aria-pressed', String(now)); announce(now ? 'High contrast enabled' : 'High contrast disabled'); });
+  }
 
   stopBtn.addEventListener('click', ()=>{
     if('speechSynthesis' in window) window.speechSynthesis.cancel();

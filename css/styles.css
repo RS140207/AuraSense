@@ -188,6 +188,11 @@ section{scroll-margin-top:calc(var(--header-offset) + 12px)}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem}
 .card{background:var(--panel);padding:1rem;border-radius:10px;border:1px solid rgba(15,23,42,0.03)}
 .card h4{margin:.25rem 0}
+.card-actions{margin-top:.5rem;display:flex;gap:.5rem}
+.assistant-btn{background:linear-gradient(90deg,var(--brand-color),var(--accent));color:#fff;border:none;padding:.5rem .75rem;border-radius:8px;cursor:pointer}
+.assistant-btn[aria-pressed="true"]{transform:translateY(-2px)}
+.contrast-btn{background:#fff;border:1px solid #ddd;color:var(--brand-color)}
+.contrast-btn[aria-pressed="true"]{background:linear-gradient(90deg,var(--brand-color),var(--accent));color:#fff}
 
 /* testimonial */
 .testimonial{font-style:italic;background:linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));padding:1rem;border-left:4px solid var(--accent);border-radius:6px;margin-top:1rem}

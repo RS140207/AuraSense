@@ -31,3 +31,12 @@ Notes & limitations:
 - Speech recognition support varies by browser; if not available, the voice toggle will indicate it's disabled.
 
 Please test on the target device (mobile recommended) and let us know if you want this to also send a network alert to a server or emergency service (would require backend integration).
+
+### Assistive demo updates
+
+The **Assistive demo** now includes:
+
+- **AI voice-guided navigation** — Start the assistant and speak commands like **"Read the page"**, **"Increase font"**, **"Go to contact"**, **"High contrast"**, or **"Open menu"**. Works best on browsers that support the Web Speech API and with microphone permission.
+- **High-contrast preview** — Toggle a high-contrast theme to review visual accessibility of the site.
+
+These are client-side demos. For deeper features (server-side logs, remote assistance), we can add backend integrations on request.
