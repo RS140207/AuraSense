@@ -139,6 +139,12 @@ section{scroll-margin-top:calc(var(--header-offset) + 12px)}
 #pathProgressWrap{margin-top:.5rem}
 #progressText{margin-top:.35rem}
 
+/* screen reader tool (beginner-only) */
+.sr-tool{display:flex;gap:.5rem;align-items:center;margin-top:.6rem;background:linear-gradient(90deg,#fff,#fbfbfb);padding:.6rem;border-radius:8px;border:1px solid #e6e6e6}
+.sr-tool label{font-weight:700}
+.sr-tool input[type=range]{width:140px}
+.sr-tool button{white-space:nowrap}
+
 /* try page */
 .try-hero{padding:1.5rem 0;margin:1rem 0;border-radius:10px;background:linear-gradient(90deg,var(--brand-color),var(--accent));color:#fff}
 .try-cards .cards{margin-top:1rem}

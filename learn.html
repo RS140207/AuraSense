@@ -65,6 +65,16 @@
 
     <section id="pathDetail" class="path-detail" aria-labelledby="path-title" hidden>
       <h2 id="path-title">Path name</h2>
+
+      <div id="screenReaderTool" class="sr-tool" hidden aria-hidden="true">
+        <label id="srLabel">Screen reader:</label>
+        <button id="srToggle" class="cta ghost" aria-pressed="false">Start</button>
+        <button id="srStop" class="cta ghost" style="display:none">Stop</button>
+        <label for="srRate" class="hint" style="margin-left:8px">Rate</label>
+        <input id="srRate" type="range" min="0.5" max="2" step="0.1" value="1" aria-labelledby="srLabel">
+        <button id="srReadModules" class="cta ghost" style="margin-left:auto">Read modules</button>
+      </div>
+
       <div id="pathProgressWrap">
         <label for="progress">Progress</label>
         <div class="progress" aria-hidden="true"><div id="pathProgress" class="progress-bar" style="--p:0%"></div></div>
@@ -169,6 +179,8 @@
         updatePathProgressUI(level);
 
         document.getElementById('resetPath').onclick = function(){ setProgress(level, []); updatePathProgressUI(level); renderPathCardProgress(); };
+        // show/hide beginner-only screen reader tool
+        updateSRVisibility(level);
       }
 
       function updatePathProgressUI(level){
@@ -178,6 +190,66 @@
         document.getElementById('pathProgress').style.setProperty('--p', percent + '%');
         document.getElementById('progressText').textContent = percent + '% complete';
       }
+
+      // Beginner-only screen reader tool (simple Web Speech TTS)
+      function updateSRVisibility(level){
+        const srTool = document.getElementById('screenReaderTool');
+        if(!srTool) return;
+        if(level === 'beginner'){
+          srTool.hidden = false; srTool.setAttribute('aria-hidden','false');
+        } else {
+          srTool.hidden = true; srTool.setAttribute('aria-hidden','true');
+          if(window.speechSynthesis) window.speechSynthesis.cancel();
+          const srToggle = document.getElementById('srToggle');
+          const srStop = document.getElementById('srStop');
+          if(srToggle) { srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); }
+          if(srStop) srStop.style.display='none';
+        }
+      }
+
+      (function initScreenReader(){ 
+        const srToggle = document.getElementById('srToggle');
+        const srStop = document.getElementById('srStop');
+        const srRate = document.getElementById('srRate');
+        const srReadModules = document.getElementById('srReadModules');
+        if(!srToggle) return;
+        let srActive = false;
+        let srQueue = [];
+
+        function speakText(text){
+          if(!window.speechSynthesis) return;
+          const u = new SpeechSynthesisUtterance(text);
+          u.rate = Number(srRate.value) || 1;
+          u.onend = function(){ if(srQueue.length>0){ speakText(srQueue.shift()); } else { srActive=false; srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); srStop.style.display='none'; } };
+          window.speechSynthesis.speak(u);
+          srActive = true;
+          srToggle.textContent='Stop';
+          srToggle.setAttribute('aria-pressed','true');
+          srStop.style.display='inline-block';
+        }
+
+        srToggle.addEventListener('click', function(){
+          if(!window.speechSynthesis){ alert('Speech synthesis not supported in this browser.'); return; }
+          if(srActive){ window.speechSynthesis.cancel(); srActive=false; srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); srStop.style.display='none'; }
+          else { speakText('Screen reader activated. Use Read modules to hear the module titles and short descriptions.'); }
+        });
+
+        srStop.addEventListener('click', function(){ window.speechSynthesis.cancel(); srActive=false; srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); srStop.style.display='none'; });
+
+        srReadModules.addEventListener('click', function(){
+          const title = document.getElementById('path-title').textContent || '';
+          const level = title.toLowerCase().includes('beginner') ? 'beginner' : title.toLowerCase().includes('intermediate') ? 'intermediate' : 'advanced';
+          const modules = MODULES[level] || [];
+          if(!modules.length) return;
+          srQueue = modules.map(m => `${m.title}. ${m.desc}`);
+          if(!srActive){
+            speakText(srQueue.shift());
+          }
+        });
+
+        // update rate live
+        srRate.addEventListener('input', function(){ if(window.speechSynthesis && window.speechSynthesis.speaking){ window.speechSynthesis.cancel(); } });
+      })();
 
       document.querySelectorAll('.select-path').forEach(a=>a.addEventListener('click', (e)=>{ e.preventDefault(); const level = a.dataset.level; showPath(level); }));
       document.getElementById('startLearning').addEventListener('click', ()=>{ document.querySelector('.select-path').click(); });
