@@ -65,6 +65,16 @@
 
     <section id="pathDetail" class="path-detail" aria-labelledby="path-title" hidden>
       <h2 id="path-title">Path name</h2>
+
+      <div id="screenReaderTool" class="sr-tool" hidden aria-hidden="true">
+        <label id="srLabel">Screen reader:</label>
+        <button id="srToggle" class="cta ghost" aria-pressed="false">Start</button>
+        <button id="srStop" class="cta ghost" style="display:none">Stop</button>
+        <label for="srRate" class="hint" style="margin-left:8px">Rate</label>
+        <input id="srRate" type="range" min="0.5" max="2" step="0.1" value="1" aria-labelledby="srLabel">
+        <button id="srReadModules" class="cta ghost" style="margin-left:auto">Read modules</button>
+      </div>
+
       <div id="pathProgressWrap">
         <label for="progress">Progress</label>
         <div class="progress" aria-hidden="true"><div id="pathProgress" class="progress-bar" style="--p:0%"></div></div>
@@ -99,7 +109,12 @@
     (function(){
       const MODULES = {
         beginner: [
-          {id:'b1',title:'Intro to screen readers',desc:'Overview and what to expect.'},
+          {id:'b1',title:'Intro to screen readers',desc:'Overview and what to expect.', content: {
+              explanation: 'A screen reader is software that converts text and interface elements into spoken words or braille, enabling blind and low-vision users to interact with phones and computers.',
+              example: 'For example, when you receive a text message the screen reader announces who sent it and reads the message; you can then reply using keyboard or gesture shortcuts without needing to see the screen.',
+              // 1–2 minute sample audio script (contains the exact example sentence requested)
+              audioScript: 'A screen reader reads text on your screen aloud. It helps blind and low-vision users use phones and computers independently. In this short audio, we will explain what a screen reader does and give a practical example. Screen readers speak app names, headings, buttons and the text you type; they also announce status messages like battery level or incoming calls. For instance, when a message arrives, the screen reader tells you who sent it and reads the content; you can reply using simple keyboard shortcuts or touch gestures. To practice, listen to menus and explore settings while following along with your finger or keyboard. Start with short tasks and repeat them until navigation becomes familiar. With time, a screen reader makes everyday phone and computer tasks quicker and more independent.'
+            }},
           {id:'b2',title:'Basic keyboard shortcuts',desc:'Learn essential shortcuts.'},
           {id:'b3',title:'Enable accessibility on your device',desc:'Settings for Android/iOS/Windows.'}
         ],
@@ -151,6 +166,8 @@
         MODULES[level].forEach(m=>{
           const li = document.createElement('li');
           li.innerHTML = `<div><strong>${m.title}</strong><p class="hint">${m.desc}</p></div>`;
+
+          // completion button
           const btn = document.createElement('button');
           btn.className='cta ghost';
           btn.textContent = completed.has(m.id) ? 'Completed' : 'Mark complete';
@@ -163,12 +180,83 @@
             updatePathProgressUI(level);
             renderPathCardProgress();
           });
-          const wrapper = document.createElement('div'); wrapper.style.display='flex'; wrapper.style.justifyContent='space-between'; wrapper.style.alignItems='center'; wrapper.appendChild(li); wrapper.appendChild(btn);
-          modulesEl.appendChild(wrapper);
+
+          const rightCol = document.createElement('div'); rightCol.style.display='flex'; rightCol.style.alignItems='center'; rightCol.style.gap='0.6rem';
+          rightCol.appendChild(btn);
+
+          // if module has extra content, add a details toggle and audio controls
+          if(m.content){
+            const toggle = document.createElement('button');
+            toggle.className='cta ghost';
+            toggle.textContent='View details';
+            toggle.setAttribute('aria-expanded','false');
+            toggle.addEventListener('click', ()=>{
+              const open = toggle.getAttribute('aria-expanded') === 'true';
+              toggle.setAttribute('aria-expanded', String(!open));
+              detailDiv.hidden = open;
+              if(!open) toggle.textContent='Hide details'; else toggle.textContent='View details';
+            });
+
+            const detailDiv = document.createElement('div');
+            detailDiv.className = 'module-content';
+            detailDiv.hidden = true;
+            detailDiv.innerHTML = `
+              <p><strong>Simple explanation</strong>: <span>${m.content.explanation}</span></p>
+              <p><strong>Real-life example</strong>: <span>${m.content.example}</span></p>
+              <p><strong>Audio-only sample</strong>: <span class="hint">About 1–2 minutes. Click Play to listen.</span></p>
+              <div style="display:flex;gap:.5rem;align-items:center;margin-top:.45rem">
+                <button class="cta ghost play-module-audio">Play audio (1–2 min)</button>
+                <button class="cta ghost stop-module-audio" style="display:none">Stop</button>
+                <a class="cta ghost" href="#" download="intro-screen-reader.txt">Download script</a>
+              </div>
+            `;
+
+            // attach handlers after inserting
+            rightCol.appendChild(toggle);
+            const container = document.createElement('div'); container.style.display='flex'; container.style.flexDirection='column'; container.style.alignItems='stretch'; container.appendChild(li); container.appendChild(detailDiv);
+
+            modulesEl.appendChild(container);
+
+            // handlers
+            const playBtn = detailDiv.querySelector('.play-module-audio');
+            const stopBtn = detailDiv.querySelector('.stop-module-audio');
+            const downloadLink = detailDiv.querySelector('a[download]');
+            const scriptText = m.content.audioScript;
+
+            playBtn.addEventListener('click', function(){
+              if(!window.speechSynthesis){ alert('Speech synthesis not supported in this browser.'); return; }
+              // stop any existing speech
+              if(window.speechSynthesis.speaking){ window.speechSynthesis.cancel(); }
+              const u = new SpeechSynthesisUtterance(scriptText);
+              u.rate = 1;
+              u.onend = function(){ stopBtn.style.display='none'; playBtn.style.display='inline-block'; };
+              window.speechSynthesis.speak(u);
+              playBtn.style.display='none'; stopBtn.style.display='inline-block';
+            });
+            stopBtn.addEventListener('click', function(){ window.speechSynthesis.cancel(); stopBtn.style.display='none'; playBtn.style.display='inline-block'; });
+
+            downloadLink.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(scriptText);
+          } else {
+            // append basic li when no extra content
+            modulesEl.appendChild(li);
+          }
+
+          // for modules without the detailed container, adjust wrapper
+          if(!m.content){
+            const wrapper = document.createElement('div'); wrapper.style.display='flex'; wrapper.style.justifyContent='space-between'; wrapper.style.alignItems='center'; wrapper.appendChild(li); wrapper.appendChild(rightCol);
+            modulesEl.appendChild(wrapper);
+          } else {
+            // when content exists, ensure completed button remains in place in the detail header
+            const headerRow = container.querySelector('div');
+            headerRow.style.display='flex'; headerRow.style.justifyContent='space-between'; headerRow.style.alignItems='center';
+            headerRow.appendChild(rightCol);
+          }
         });
         updatePathProgressUI(level);
 
         document.getElementById('resetPath').onclick = function(){ setProgress(level, []); updatePathProgressUI(level); renderPathCardProgress(); };
+        // show/hide beginner-only screen reader tool
+        updateSRVisibility(level);
       }
 
       function updatePathProgressUI(level){
@@ -178,6 +266,66 @@
         document.getElementById('pathProgress').style.setProperty('--p', percent + '%');
         document.getElementById('progressText').textContent = percent + '% complete';
       }
+
+      // Beginner-only screen reader tool (simple Web Speech TTS)
+      function updateSRVisibility(level){
+        const srTool = document.getElementById('screenReaderTool');
+        if(!srTool) return;
+        if(level === 'beginner'){
+          srTool.hidden = false; srTool.setAttribute('aria-hidden','false');
+        } else {
+          srTool.hidden = true; srTool.setAttribute('aria-hidden','true');
+          if(window.speechSynthesis) window.speechSynthesis.cancel();
+          const srToggle = document.getElementById('srToggle');
+          const srStop = document.getElementById('srStop');
+          if(srToggle) { srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); }
+          if(srStop) srStop.style.display='none';
+        }
+      }
+
+      (function initScreenReader(){ 
+        const srToggle = document.getElementById('srToggle');
+        const srStop = document.getElementById('srStop');
+        const srRate = document.getElementById('srRate');
+        const srReadModules = document.getElementById('srReadModules');
+        if(!srToggle) return;
+        let srActive = false;
+        let srQueue = [];
+
+        function speakText(text){
+          if(!window.speechSynthesis) return;
+          const u = new SpeechSynthesisUtterance(text);
+          u.rate = Number(srRate.value) || 1;
+          u.onend = function(){ if(srQueue.length>0){ speakText(srQueue.shift()); } else { srActive=false; srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); srStop.style.display='none'; } };
+          window.speechSynthesis.speak(u);
+          srActive = true;
+          srToggle.textContent='Stop';
+          srToggle.setAttribute('aria-pressed','true');
+          srStop.style.display='inline-block';
+        }
+
+        srToggle.addEventListener('click', function(){
+          if(!window.speechSynthesis){ alert('Speech synthesis not supported in this browser.'); return; }
+          if(srActive){ window.speechSynthesis.cancel(); srActive=false; srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); srStop.style.display='none'; }
+          else { speakText('Screen reader activated. Use Read modules to hear the module titles and short descriptions.'); }
+        });
+
+        srStop.addEventListener('click', function(){ window.speechSynthesis.cancel(); srActive=false; srToggle.textContent='Start'; srToggle.setAttribute('aria-pressed','false'); srStop.style.display='none'; });
+
+        srReadModules.addEventListener('click', function(){
+          const title = document.getElementById('path-title').textContent || '';
+          const level = title.toLowerCase().includes('beginner') ? 'beginner' : title.toLowerCase().includes('intermediate') ? 'intermediate' : 'advanced';
+          const modules = MODULES[level] || [];
+          if(!modules.length) return;
+          srQueue = modules.map(m => `${m.title}. ${m.desc}`);
+          if(!srActive){
+            speakText(srQueue.shift());
+          }
+        });
+
+        // update rate live
+        srRate.addEventListener('input', function(){ if(window.speechSynthesis && window.speechSynthesis.speaking){ window.speechSynthesis.cancel(); } });
+      })();
 
       document.querySelectorAll('.select-path').forEach(a=>a.addEventListener('click', (e)=>{ e.preventDefault(); const level = a.dataset.level; showPath(level); }));
       document.getElementById('startLearning').addEventListener('click', ()=>{ document.querySelector('.select-path').click(); });
