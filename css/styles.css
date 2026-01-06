@@ -28,11 +28,11 @@ body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   font-size: var(--base-font-size);
-  /* animated gradient background with subtle overlay to preserve contrast */
+  /* vibrant cool animated gradient background with subtle overlay to preserve contrast */
   background:
-    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    linear-gradient(#000000 100%);
-  background-size: 800% 800%;
+    linear-gradient(rgba(2, 6, 23, 0.36), rgba(2, 6, 23, 0.36)),
+    linear-gradient(135deg, #07174c 0%, #0ea5a2 40%, #7c3aed 75%);
+  background-size: 300% 300%;
   animation: gradientShift 18s ease infinite;
   color: var(--text);
   line-height: 1.5;
@@ -76,15 +76,15 @@ body {
 
 /* header */
 .site-header {
-  border-bottom: 1px solid #e6e6e6;
-  background: linear-gradient(0deg, rgba(255, 255, 0, 0.95), rgba(255, 255, 0, 0.95));
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(90deg, rgba(124,58,237,0.95), rgba(14,165,162,0.95));
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
   backdrop-filter: blur(6px);
-  box-shadow: 0 8px 36px rgba(255, 255, 0, 0.3);
+  box-shadow: 0 8px 36px rgba(12, 24, 60, 0.28);
   --header-offset: 64px;
   transition: box-shadow 160ms ease
 }
@@ -101,7 +101,7 @@ body {
   font-weight: 700;
   font-size: 1.125rem;
   text-decoration: none;
-  color: #000;
+  color: #fff;
   display: inline-flex;
   align-items: center;
   gap: .5rem;
@@ -141,10 +141,10 @@ body {
   font-size: .68rem;
   padding: .12rem .33rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ffff00, #ffff33);
-  color: #000;
+  background: linear-gradient(90deg, #7c3aed, #0ea5a2);
+  color: #fff;
   margin-left: .35rem;
-  box-shadow: 0 6px 18px rgba(255, 255, 0, 0.3)
+  box-shadow: 0 6px 18px rgba(14, 165, 162, 0.14)
 }
 
 .header-actions {
