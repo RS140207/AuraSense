@@ -1169,11 +1169,19 @@ footer {
 .login-form label {
   font-weight: 700;
   display: block;
-  margin-top: 1rem
+  margin-top: 1rem;
+  color: #000; /* make labels readable on login card */
 }
 
 .login-form label:first-child {
   margin-top: 0
+}
+
+/* Ensure specific fields requested are explicitly black */
+.login-form label[for="password"],
+.login-form label[for="emergency"],
+.login-form label[for="remember"] {
+  color: #000;
 }
 
 .login-form input {
