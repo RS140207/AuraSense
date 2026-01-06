@@ -474,4 +474,79 @@
     });
   });
 
+  // Hover to speak aria-label for circular cards
+  const circularCards = document.querySelectorAll('.circular-card');
+  circularCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const text = card.textContent.trim();
+      if (text && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+      }
+    });
+  });
+
+  // Click to toggle grey for circular cards
+  circularCards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevent link navigation
+      card.classList.toggle('grey');
+    });
+  });
+
+  //identify alphabet button
+  const idAlphaBtn = document.getElementById('id-alpha');
+  if (idAlphaBtn) {
+    idAlphaBtn.addEventListener('mouseenter', () => {
+      const text = idAlphaBtn.textContent.trim();
+      if (text && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+      }
+    });
+    idAlphaBtn.addEventListener('click', () => {
+      const greyCards = Array.from(circularCards).filter(card => card.classList.contains('grey'));
+      if (greyCards.length === 1 && greyCards[0] === circularCards[0]) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet A');
+        window.speechSynthesis.speak(utterance);
+      } else if (greyCards.length === 2 && greyCards.includes(circularCards[0]) && greyCards.includes(circularCards[2])) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet B');
+        window.speechSynthesis.speak(utterance);
+      } else if (greyCards.length === 2 && greyCards.includes(circularCards[0]) && greyCards.includes(circularCards[1])) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet C');
+        window.speechSynthesis.speak(utterance);
+      } else if (greyCards.length === 3 && greyCards.includes(circularCards[0]) && greyCards.includes(circularCards[3]) && greyCards.includes(circularCards[4])) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet D');
+        window.speechSynthesis.speak(utterance);
+      } else if (greyCards.length === 2 && greyCards.includes(circularCards[0]) && greyCards.includes(circularCards[4])) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet E');
+        window.speechSynthesis.speak(utterance);
+      } else if (greyCards.length === 3 && greyCards.includes(circularCards[0]) && greyCards.includes(circularCards[3]) && greyCards.includes(circularCards[2])) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet F');
+        window.speechSynthesis.speak(utterance);
+      } else if (greyCards.length === 4 && greyCards.includes(circularCards[0]) && greyCards.includes(circularCards[1]) && greyCards.includes(circularCards[2]) && greyCards.includes(circularCards[3])) {
+        const utterance = new SpeechSynthesisUtterance('this is alphabet G');
+        window.speechSynthesis.speak(utterance);
+      }
+    });
+  }
+
+  // Reset button
+  const resetBtn = document.getElementById('reset-dots');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      circularCards.forEach(card => {
+        card.classList.remove('grey');
+      });
+    });
+    // Hover to speak text
+    resetBtn.addEventListener('mouseenter', () => {
+      const text = resetBtn.textContent.trim();
+      if (text && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+      }
+    });
+  }
+
 })();
