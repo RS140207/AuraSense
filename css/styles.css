@@ -1411,8 +1411,8 @@ video {
 }
 
 .circular-card.grey {
-  background-color: grey;
-  color: grey;
+  background-color: #f1fd0e;
+  color: #f1fd0e;
 }
 
 .reset-btn {
