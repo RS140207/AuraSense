@@ -38,11 +38,6 @@
     highlightedElements = [];
   }
 
-  //backend test
-  fetch("https://aurasense-1.onrender.com/", {
-  method: "POST",
-  body: formData
-})
 
   // add a small logout button to header when signed in
   function ensureAuthUI(){
